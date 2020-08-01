@@ -10,7 +10,6 @@ var knownCDN = [
   /https:\/\/ajax\.googleapis\.com/,
   /https:\/\/cdnjs\.cloudflare\.com/
 ];
-let name_pattern = new RegExp('[^/]*$');
 function handleRequest(requestDetails) {
   console.log("Checking: " + requestDetails.url);
   if(redirect) {
@@ -87,7 +86,6 @@ function getLocalResponse(libraryDetails) {
           };
       }
     case "google":
-    case "userblock":
       console.log("Blocked: " + libraryDetails.type);
       return {
         cancel: true
@@ -101,7 +99,6 @@ function getLocalResponse(libraryDetails) {
 
 function getLibraryType(url) {
   var match = -1;
-  var cdnsource = "unknown";
   match = url.search(/\/jquery-\d.*\.js/);
   if(match != -1) {
     return {
@@ -153,28 +150,64 @@ function getLibraryType(url) {
 function handleMessage(message) {
   switch(message.cmd) {
     case "reload":
-      loadSettings(message.settings);
+      loadPageSettings(message.settings);
       return;
+    case "removeUrl":
+      
     default:
       console.warn("Undefined cmd: " + message.cmd);
   }
 }
 
-function loadSettings(settings) {
+function handleBlock(requestDetails) {
+  for(const regexp of userblocks.regexps) {
+    if(regexp.test(requestDetails.url)) {
+      console.log("Blocking: " + requestDetails.url);
+      return {
+        cancel: true
+      };
+    }
+  }
+  return {};
+}
+
+function addBlockListener() {
+  return browser.webRequest.onBeforeRequest.addListener(
+    handleBlock,
+    {urls:userblocks.urls},
+    ["blocking"]
+  );
+}
+
+function loadPageSettings(settings) {
   redirect = settings.redirect;
+  if(settings.userBlockEnabled != userBlockEnabled) {
+    userBlockEnabled = settings.userBlockEnabled;
+    if(userBlockEnabled) browser.webRequest.onBeforeRequest.removeListener(blockListener);
+    else blockListener = addBlockListener();
+  }
 }
 
 function loadLocalSettings() {
   redirect = !(!browser.storage.sync.get("redirect"));
   CDNaddress = CDNaddress || browser.storage.sync.get("CDNaddress");
+  userblocks = userblocks || browser.storage.sync.get("userblocks");
+  userBlockEnabled = userBlockEnabled || browser.storage.sync.get("userBlockEnabled");
 }
 
-var redirect;
+var redirect = true;
 var CDNaddress = "https://cdn.bootcdn.net";
+var userblocks = {
+  "urls": [],
+  "regexps": []
+};
+var userBlockEnabled = false;
+var blockListener;
 loadLocalSettings();
 browser.webRequest.onBeforeRequest.addListener(
   handleRequest,
   {urls:url_patterns, types:["script", "stylesheet"]},
   ["blocking"]
 );
+if(userBlockEnabled) blockListener = addBlockListener();
 browser.runtime.onMessage.addListener(handleMessage);

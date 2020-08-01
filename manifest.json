@@ -9,7 +9,11 @@
       "48": "icons/icon-48.png",
       "72": "icons/icon-72.png"
     },
+    "options_ui": {
+      "page": "options/options.html"
+    },
     "permissions": [
+      "activeTab",
       "webRequest",
       "webRequestBlocking",
       "*://*/*",
