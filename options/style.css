@@ -110,16 +110,16 @@
 
   button#addSite,
   button#addReg,
-  button.removeButton
+  button.removeUrlButton,
+  button.removeRegButton
   {
     float: right;
-    margin: 0px 10px 10px 10px;
   }
 
   input#newSite,
   input#newReg
   {
-    float: right;
+    float: left;
   }
 
   div#rules {

@@ -17,13 +17,21 @@ function loadAllOptions() {
         "redirect": browser.storage.sync.get("redirect"),
         "userBlockEnabled": browser.storage.sync.get("userBlockEnabled")
     };
-    pageOptions.then(function(result) {
-        document.querySelector("#redirect").checked = !(!result.pageOptions.redirect);
-        document.querySelector("#block").checked = !(!result.pageOptions.userBlockEnabled);
+    pageOptions.redirect.then(function(result) {
+        document.querySelector("#redirect").checked = !(!result.redirect);
+    });
+    pageOptions.userBlockEnabled.then(function(result) {
+        document.querySelector("#block").checked = !(!result.userBlockEnabled);
     });
     let blockList = browser.storage.sync.get("userblocks");
     blockList.then(function(result) {
         loadBlockList(result.blockList);
+    },
+    function(error) {
+        blockList = {
+            "urls": [],
+            "regexps": []
+        };
     });
 }
 
@@ -31,10 +39,17 @@ function loadBlockList(blockList) {
     let rulesdiv = document.getElementById("rules").innerHTML;
     for(const url of blockList.urls) {
         rulesdiv += (`<p class="url-list-item">${url}</p>
-        <button class="removeButton" id="${url}">remove</button>`);
+        <button class="removeUrlButton" id="${url}">remove</button>`);
     }
-    for(const element of document.querySelectorAll(".removeButton")){ 
+    for(const element of document.querySelectorAll(".removeUrlButton")){ 
         element.addEventListener("click", removeUrl);
+    }
+    for(const reg of blockList.regexps) {
+        rulesdiv += (`<p class="reg-list-item">${reg}</p>
+        <button class="removeRegButton" id="${reg}">remove</button>`);
+    }
+    for(const element of document.querySelectorAll(".removeRegButton")){ 
+        element.addEventListener("click", removeReg);
     }
 }
 
@@ -43,8 +58,16 @@ function removeUrl(e) {
     browser.runtime.sendMessage({
         "cmd": "removeUrl",
         "url": `${e.target.id}`
-    });
-    browser.tabs.reload();
+    })
+    .then(browser.tabs.reload);
+}
+
+function removeReg(e) {
+    browser.runtime.sendMessage({
+        "cmd": "removeReg",
+        "reg": `${e.target.id}`
+    })
+    .then(browser.tabs.reload);
 }
 
 document.addEventListener("DOMContentLoaded", loadAllOptions);

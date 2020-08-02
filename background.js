@@ -153,7 +153,21 @@ function handleMessage(message) {
       loadPageSettings(message.settings);
       return;
     case "removeUrl":
-      
+      const urlindex = userblocks.urls.indexOf(message.url);
+      if(urlindex > -1) userblocks.urls.splice(urlindex, 1);
+      browser.storage.sync.set({
+        userblocks: userblocks
+      })
+      .then(browser.runtime.reload);
+      return;
+    case "removeReg":
+      const regindex = userblocks.regexps.indexOf(message.reg);
+      if(regindex > -1) userblocks.regexps.splice(regindex, 1);
+      browser.storage.sync.set({
+        userblocks: userblocks
+      })
+      .then(browser.runtime.reload);
+      return;
     default:
       console.warn("Undefined cmd: " + message.cmd);
   }
@@ -183,8 +197,8 @@ function loadPageSettings(settings) {
   redirect = settings.redirect;
   if(settings.userBlockEnabled != userBlockEnabled) {
     userBlockEnabled = settings.userBlockEnabled;
-    if(userBlockEnabled) browser.webRequest.onBeforeRequest.removeListener(blockListener);
-    else blockListener = addBlockListener();
+    if(userBlockEnabled && (userblocks.urls.length)) blockListener = addBlockListener();
+    else if(userblocks.urls.length) browser.webRequest.onBeforeRequest.removeListener(blockListener);
   }
 }
 
@@ -209,5 +223,5 @@ browser.webRequest.onBeforeRequest.addListener(
   {urls:url_patterns, types:["script", "stylesheet"]},
   ["blocking"]
 );
-if(userBlockEnabled) blockListener = addBlockListener();
+if(userBlockEnabled && (userblocks.urls.length)) blockListener = addBlockListener();
 browser.runtime.onMessage.addListener(handleMessage);

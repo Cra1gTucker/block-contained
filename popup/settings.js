@@ -17,9 +17,11 @@ function loadPageOptions() {
         "redirect": browser.storage.sync.get("redirect"),
         "userBlockEnabled": browser.storage.sync.get("userBlockEnabled")
     };
-    pageOptions.then(function(result) {
-        document.querySelector("#redirect").checked = !(!result.pageOptions.redirect);
-        document.querySelector("#block").checked = !(!result.pageOptions.userBlockEnabled);
+    pageOptions.redirect.then(function(result) {
+        document.querySelector("#redirect").checked = !(!result.redirect);
+    });
+    pageOptions.userBlockEnabled.then(function(result) {
+        document.querySelector("#block").checked = !(!result.userBlockEnabled);
     });
 }
 
