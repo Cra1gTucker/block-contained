@@ -158,7 +158,9 @@ function handleMessage(message) {
       browser.storage.sync.set({
         userblocks: userblocks
       })
-      .then(browser.runtime.reload);
+      .then(function() {
+        browser.runtime.reload();
+      });
       return;
     case "removeReg":
       const regindex = userblocks.regexps.indexOf(message.reg);
@@ -166,7 +168,27 @@ function handleMessage(message) {
       browser.storage.sync.set({
         userblocks: userblocks
       })
-      .then(browser.runtime.reload);
+      .then(function() {
+        browser.runtime.reload();
+      });
+      return;
+    case "addUrl":
+      userblocks.urls.push(message.url);
+      browser.storage.sync.set({
+        userblocks: userblocks
+      })
+      .then(function() {
+        browser.runtime.reload();
+      });
+      return;
+    case "addReg":
+      userblocks.regexps.push(message.reg);
+      browser.storage.sync.set({
+        userblocks: userblocks
+      })
+      .then(function() {
+        browser.runtime.reload();
+      });
       return;
     default:
       console.warn("Undefined cmd: " + message.cmd);
@@ -204,13 +226,21 @@ function loadPageSettings(settings) {
 
 function loadLocalSettings() {
   redirect = !(!browser.storage.sync.get("redirect"));
-  CDNaddress = CDNaddress || browser.storage.sync.get("CDNaddress");
-  userblocks = userblocks || browser.storage.sync.get("userblocks");
+  CDNaddress = browser.storage.sync.get("CDNaddress");
+  CDNaddress.then(function() {
+    if(CDNaddress == undefined) CDNaddress = "https://cdn.bootcdn.net"
+  });
+  let blocks_promise = browser.storage.sync.get("userblocks");
+  blocks_promise.then(
+    function(result) {
+      if(result.userblocks) userblocks = result.userblocks;
+    }
+  );
   userBlockEnabled = userBlockEnabled || browser.storage.sync.get("userBlockEnabled");
 }
 
 var redirect = true;
-var CDNaddress = "https://cdn.bootcdn.net";
+var CDNaddress = "";
 var userblocks = {
   "urls": [],
   "regexps": []

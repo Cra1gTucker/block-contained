@@ -23,9 +23,9 @@ function loadAllOptions() {
     pageOptions.userBlockEnabled.then(function(result) {
         document.querySelector("#block").checked = !(!result.userBlockEnabled);
     });
-    let blockList = browser.storage.sync.get("userblocks");
+    blockList = browser.storage.sync.get("userblocks");
     blockList.then(function(result) {
-        loadBlockList(result.blockList);
+        loadBlockList(result.userblocks);
     },
     function(error) {
         blockList = {
@@ -36,16 +36,17 @@ function loadAllOptions() {
 }
 
 function loadBlockList(blockList) {
-    let rulesdiv = document.getElementById("rules").innerHTML;
+    if(!blockList || (!blockList.urls.length && !blockList.regexps.length)) return;
+    let rulesdiv = document.getElementById("rules");
     for(const url of blockList.urls) {
-        rulesdiv += (`<p class="url-list-item">${url}</p>
+        rulesdiv.innerHTML += (`<p class="url-list-item">${url}</p>
         <button class="removeUrlButton" id="${url}">remove</button>`);
     }
     for(const element of document.querySelectorAll(".removeUrlButton")){ 
         element.addEventListener("click", removeUrl);
     }
     for(const reg of blockList.regexps) {
-        rulesdiv += (`<p class="reg-list-item">${reg}</p>
+        rulesdiv.innerHTML += (`<p class="reg-list-item">${reg}</p>
         <button class="removeRegButton" id="${reg}">remove</button>`);
     }
     for(const element of document.querySelectorAll(".removeRegButton")){ 
@@ -70,6 +71,30 @@ function removeReg(e) {
     .then(browser.tabs.reload);
 }
 
+function addUrl(e) {
+    browser.runtime.sendMessage({
+        "cmd": "addUrl",
+        "url": `${document.getElementById("newSite").value}`
+    })
+    .then(browser.tabs.reload);
+}
+
+function addReg(e) {
+    browser.runtime.sendMessage({
+        "cmd": "addReg",
+        "reg": `${document.getElementById("newReg").value}`
+    })
+    .then(browser.tabs.reload);
+}
+
+
+var blockList = {
+    "urls": [],
+    "regexps": []
+};
+
 document.addEventListener("DOMContentLoaded", loadAllOptions);
 document.querySelector("#redirect").addEventListener("click", savePageOptions);
 document.querySelector("#block").addEventListener("click", savePageOptions);
+document.querySelector("#addSite").addEventListener("click", addUrl);
+document.querySelector("#addReg").addEventListener("click", addReg);

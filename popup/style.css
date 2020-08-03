@@ -37,10 +37,6 @@
     margin: 0;
   }
   
-  h3 {
-    font-size: 16px;
-  }
-  
   h1,
   h2 {
     color: var(--text-main);
