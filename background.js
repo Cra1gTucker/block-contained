@@ -2,18 +2,17 @@ var url_patterns = [
   "https://code.jquery.com/jquery-*.js",
   "https://ajax.googleapis.com/ajax/libs/*",
   "https://ajax.googleapis.com/ajax/libs/*?*",
-  "https://*.google.com/*",
   "https://cdnjs.cloudflare.com/ajax/libs/*",
   "https://cdnjs.cloudflare.com/ajax/libs/*?*"
 ];
-var knownCDN = [
+var scriptCDNs = [
   /https:\/\/ajax\.googleapis\.com/,
   /https:\/\/cdnjs\.cloudflare\.com/
 ];
 function handleRequest(requestDetails) {
   console.log("Checking: " + requestDetails.url);
   if(redirect) {
-    var response = matchKnownCDN(requestDetails.url);
+    var response = matchScriptCDN(requestDetails.url);
     if(response) return response;
   }
   var libraryDetails = getLibraryType(requestDetails.url);
@@ -21,10 +20,10 @@ function handleRequest(requestDetails) {
   return getLocalResponse(libraryDetails);
 }
 
-function matchKnownCDN(url) {
-  for(const cdn of knownCDN) {
+function matchScriptCDN(url) {
+  for(const cdn of scriptCDNs) {
     if(cdn.test(url)) return {
-      redirectUrl: url.replace(cdn, CDNaddress)
+      redirectUrl: url.replace(cdn, scriptAddress)
     }
   }
 }
@@ -85,11 +84,6 @@ function getLocalResponse(libraryDetails) {
             redirectUrl: browser.extension.getURL("resources/jquery.lazy.plugins-1.7.9.min.js")
           };
       }
-    case "google":
-      console.log("Blocked: " + libraryDetails.type);
-      return {
-        cancel: true
-      };
     default:
 //Something unexpected here. We do nothing to the request.
       console.warn("Unknown library: " + libraryDetails.type);
@@ -104,13 +98,6 @@ function getLibraryType(url) {
     return {
       type: "jquery",
       version: Number(url[match + 8])
-    };
-  }
-  match = url.search(/.*\.google\.com\/.*/);
-  if(match != -1) {
-    return {
-      type: "google",
-      version: -1
     };
   }
   match = url.search(/\/[\d.]+\/jquery-migrate\.min\.js/);
@@ -226,9 +213,11 @@ function loadPageSettings(settings) {
 
 function loadLocalSettings() {
   redirect = !(!browser.storage.sync.get("redirect"));
-  CDNaddress = browser.storage.sync.get("CDNaddress");
-  CDNaddress.then(function() {
-    if(CDNaddress == undefined) CDNaddress = "https://cdn.bootcdn.net"
+  let scriptAddress_promise = browser.storage.sync.get("scriptAddress");
+  scriptAddress_promise.then(
+    function(result) {
+    if(result.scriptAddress == undefined) scriptAddress = "https://cdn.bootcdn.net";
+    else scriptAddress = result.scriptAddress;
   });
   let blocks_promise = browser.storage.sync.get("userblocks");
   blocks_promise.then(
@@ -240,7 +229,7 @@ function loadLocalSettings() {
 }
 
 var redirect = true;
-var CDNaddress = "";
+var scriptAddress = "";
 var userblocks = {
   "urls": [],
   "regexps": []
@@ -255,3 +244,14 @@ browser.webRequest.onBeforeRequest.addListener(
 );
 if(userBlockEnabled && (userblocks.urls.length)) blockListener = addBlockListener();
 browser.runtime.onMessage.addListener(handleMessage);
+browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
+  if (temporary) return; // skip during development
+  switch (reason) {
+    case "install":
+      {
+        const url = browser.runtime.getURL("onboard/index.html");
+        await browser.tabs.create({ url });
+      }
+      break;
+  }
+});
