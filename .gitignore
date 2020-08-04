@@ -1,2 +1,8 @@
 *.png
 urls.txt
+*.jpg
+*.ttf
+*.woff
+*.woff2
+*.eot
+*.svg

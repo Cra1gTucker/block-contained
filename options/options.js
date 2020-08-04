@@ -39,15 +39,15 @@ function loadBlockList(blockList) {
     if(!blockList || (!blockList.urls.length && !blockList.regexps.length)) return;
     let rulesdiv = document.getElementById("rules");
     for(const url of blockList.urls) {
-        rulesdiv.innerHTML += (`<p class="url-list-item">${url}</p>
-        <button class="removeUrlButton" id="${url}">remove</button>`);
+        rulesdiv.innerHTML += (`<p class="url-list-item">${url}
+        <button class="removeUrlButton" id="${url}">remove</button></p>`);
     }
     for(const element of document.querySelectorAll(".removeUrlButton")){ 
         element.addEventListener("click", removeUrl);
     }
     for(const reg of blockList.regexps) {
-        rulesdiv.innerHTML += (`<p class="reg-list-item">${reg}</p>
-        <button class="removeRegButton" id="${reg}">remove</button>`);
+        rulesdiv.innerHTML += (`<p class="reg-list-item">${reg}
+        <button class="removeRegButton" id="${reg}">remove</button></p>`);
     }
     for(const element of document.querySelectorAll(".removeRegButton")){ 
         element.addEventListener("click", removeReg);
