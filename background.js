@@ -190,7 +190,7 @@ function handleMessage(message) {
 
 function handleBlock(requestDetails) {
   for(const regexp of userblocks.regexps) {
-    if(regexp.test(requestDetails.url)) {
+    if(RegExp(regexp).test(requestDetails.url)) {
       console.log("Blocking: " + requestDetails.url);
       return {
         cancel: true
@@ -200,38 +200,37 @@ function handleBlock(requestDetails) {
   return {};
 }
 
-function addBlockListener() {
-  return browser.webRequest.onBeforeRequest.addListener(
-    handleBlock,
-    {urls:userblocks.urls},
-    ["blocking"]
-  );
-}
-
 function loadPageSettings(settings) {
   redirect = settings.redirect;
   if(settings.userBlockEnabled != userBlockEnabled) {
     userBlockEnabled = settings.userBlockEnabled;
-    if(userBlockEnabled && (userblocks.urls.length)) blockListener = addBlockListener();
-    else if(userblocks.urls.length) browser.webRequest.onBeforeRequest.removeListener(blockListener);
+    if(userBlockEnabled && (userblocks.urls.length)) browser.webRequest.onBeforeRequest.addListener(
+      handleBlock,
+      {urls:userblocks.urls},
+      ["blocking"]
+    );
+    else if(userblocks.urls.length) browser.webRequest.onBeforeRequest.removeListener(handleBlock);
   }
 }
 
-function loadLocalSettings() {
-  redirect = !(!browser.storage.sync.get("redirect"));
-  let scriptAddress_promise = browser.storage.sync.get("scriptAddress");
-  scriptAddress_promise.then(
-    function(result) {
-    if(result.scriptAddress == undefined) scriptAddress = "https://cdn.bootcdn.net";
-    else scriptAddress = result.scriptAddress;
-  });
-  let blocks_promise = browser.storage.sync.get("userblocks");
-  blocks_promise.then(
-    function(result) {
-      if(result.userblocks) userblocks = result.userblocks;
-    }
+//This function loads all local settings and adds user block listener if required.
+async function loadLocalSettings() {
+  redirect = (await browser.storage.sync.get("redirect")).redirect;
+  if(redirect == undefined) redirect = true;
+  scriptAddress = (await browser.storage.sync.get("scriptAddress")).scriptAddress;
+  if(scriptAddress == undefined) scriptAddress = "https://cdn.bootcdn.net";
+  userblocks = (await browser.storage.sync.get("userblocks")).userblocks;
+  if(userblocks == undefined) userblocks = {
+    urls: [],
+    regexps: []
+  };
+  userBlockEnabled = (await browser.storage.sync.get("userBlockEnabled")).userBlockEnabled;
+  if(userBlockEnabled == undefined) userBlockEnabled = false;
+  if(userBlockEnabled && (userblocks.urls.length)) await browser.webRequest.onBeforeRequest.addListener(
+    handleBlock,
+    {urls:userblocks.urls},
+    ["blocking"]
   );
-  userBlockEnabled = userBlockEnabled || browser.storage.sync.get("userBlockEnabled");
 }
 
 var redirect = true;
@@ -241,14 +240,14 @@ var userblocks = {
   "regexps": []
 };
 var userBlockEnabled = false;
-var blockListener;
+
 loadLocalSettings();
 browser.webRequest.onBeforeRequest.addListener(
   handleRequest,
   {urls:url_patterns, types:["script", "stylesheet"]},
   ["blocking"]
 );
-if(userBlockEnabled && (userblocks.urls.length)) blockListener = addBlockListener();
+
 browser.runtime.onMessage.addListener(handleMessage);
 browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
   if (temporary) return; // skip during development
