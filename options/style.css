@@ -118,8 +118,11 @@
     float: left;
   }
 
-  div#rules {
-    display: inline-flex;
+  section#blockList div {
     margin-left: 5%;
     width: 80%;
+  }
+
+  div#rules p :not(button) {
+    float: left;
   }

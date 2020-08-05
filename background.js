@@ -2,6 +2,8 @@ var url_patterns = [
   "https://code.jquery.com/jquery-*.js",
   "https://ajax.googleapis.com/ajax/libs/*",
   "https://ajax.googleapis.com/ajax/libs/*?*",
+  "https://fonts.googleapis.com/*",
+  "https://fonts.googleapis.com/*?*",
   "https://cdnjs.cloudflare.com/ajax/libs/*",
   "https://cdnjs.cloudflare.com/ajax/libs/*?*"
 ];
@@ -9,10 +11,11 @@ var scriptCDNs = [
   /https:\/\/ajax\.googleapis\.com/,
   /https:\/\/cdnjs\.cloudflare\.com/
 ];
+const googleFonts = /https:\/\/fonts\.googleapis\.com/;
 function handleRequest(requestDetails) {
   console.log("Checking: " + requestDetails.url);
   if(redirect) {
-    var response = matchScriptCDN(requestDetails.url);
+    var response = matchCDN(requestDetails.url);
     if(response) return response;
   }
   var libraryDetails = getLibraryType(requestDetails.url);
@@ -20,11 +23,14 @@ function handleRequest(requestDetails) {
   return getLocalResponse(libraryDetails);
 }
 
-function matchScriptCDN(url) {
+function matchCDN(url) {
   for(const cdn of scriptCDNs) {
     if(cdn.test(url)) return {
       redirectUrl: url.replace(cdn, scriptAddress)
     }
+  }
+  if(googleFonts.test(url)) return {
+    redirectUrl: url.replace(googleFonts, "https://fonts.font.im")
   }
 }
 

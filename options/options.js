@@ -42,12 +42,12 @@ function loadBlockList(blockList) {
         rulesdiv.innerHTML += (`<p class="url-list-item">${url}
         <button class="removeUrlButton" id="${url}">remove</button></p>`);
     }
-    for(const element of document.querySelectorAll(".removeUrlButton")){ 
-        element.addEventListener("click", removeUrl);
-    }
     for(const reg of blockList.regexps) {
         rulesdiv.innerHTML += (`<p class="reg-list-item">${reg}
         <button class="removeRegButton" id="${reg}">remove</button></p>`);
+    }
+    for(const element of document.querySelectorAll(".removeUrlButton")){ 
+        element.addEventListener("click", removeUrl);
     }
     for(const element of document.querySelectorAll(".removeRegButton")){ 
         element.addEventListener("click", removeReg);
