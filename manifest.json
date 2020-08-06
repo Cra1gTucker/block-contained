@@ -2,7 +2,7 @@
 
     "description": "Block Contained helps load websites faster inside the GFW.",
     "manifest_version": 2,
-    "name": "Block Contained: Faster loading for Chinese users",
+    "name": "Block Contained: Faster loading for users in China",
     "short_name": "BlockContained",
     "version": "1.0",
     "author": "James Shu",

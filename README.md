@@ -27,4 +27,4 @@ Block Contained通过以下方式尝试解决这个问题：
 ### 你的代码/设计/想法很差诶...
 有一说一，确实。前文已经提到这个算是练习项目，各方面自然不会很专业和周到。项目使用的是开源许可证，如果你觉得任何一部分有用，都可以fork或者clone后进行任意修改。
 ### 那么...怎么才能使用这个呢？
-这个项目仍在开发中，短时间内不会上AMO，你要是非要用一下的话，请clone这个项目，然后在Firefox的`about:debugging`页面中[载入临时附加组件](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/)并选择manifest.json，不过因为我没有把UI中用到的图片资源上传，所以显示上可能不太正常。
+这个项目仍在开发中，短时间内不会上AMO，你要是非要用一下的话，请clone这个项目，然后在Firefox的`about:debugging`页面中[载入临时附加组件](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/)并选择manifest.json，不过因为我没有把UI中用到的图片资源上传，所以显示上可能不太正常。以后我可能会以release的形式上传完整的项目。
