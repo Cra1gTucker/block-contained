@@ -8,8 +8,11 @@ var url_patterns = [
   "https://cdnjs.cloudflare.com/ajax/libs/*?*"
 ];
 var scriptCDNs = [
-  /https:\/\/ajax\.googleapis\.com/,
-  /https:\/\/cdnjs\.cloudflare\.com/
+  /https:\/\/ajax\.googleapis\.com\/ajax\/libs/,
+  /https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs/,
+  /https:\/\/ajax.aspnetcdn.com\/ajax/,
+  /https:\/\/yastatic.net/,
+  /https:\/\/cdn.jsdelivr.net/
 ];
 const googleFonts = /https:\/\/fonts\.googleapis\.com/;
 function handleRequest(requestDetails) {
@@ -218,7 +221,7 @@ async function loadLocalSettings() {
   redirect = (await browser.storage.sync.get("redirect")).redirect;
   if(redirect == undefined) redirect = true;
   scriptAddress = (await browser.storage.sync.get("scriptAddress")).scriptAddress;
-  if(scriptAddress == undefined) scriptAddress = "https://cdn.bootcdn.net";
+  if(scriptAddress == undefined) scriptAddress = "https://cdn.bootcdn.net/ajax/libs";
   userblocks = (await browser.storage.sync.get("userblocks")).userblocks;
   if(userblocks == undefined) userblocks = {
     urls: [],

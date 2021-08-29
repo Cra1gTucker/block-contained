@@ -1,6 +1,6 @@
 # Block Contained
 
-Please note that this document is not 100% translation of the Chinese document.
+Please note that this document is not an exact translation of the Chinese document.
 
 ## What is it?
 Block Contained is an **Add-on** (Extension, Plugin or whatever name you prefer...) for Firefox.
@@ -17,7 +17,5 @@ Most of the settings are self-explanatory. See below for notes for some of the s
 ### Custom Blocking Rules
 You can create custom rules for request cancelling. The request must match any of the URL match patterns **AND** any of the regular expressions to be blocked. For how to write URL match patterns, read [this](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns). The regular expressions should be written in JavaScript flavor.
 ## FAQ
-### Your code/design/idea sucks.
-Well, indeed. As mentioned before, this is a practice project. It may not meet your expectations. This project is under an open source license. If you find anything useful in it, you can fork or clone this repository and modify as you like.
-### So, how do I get this Add-on?
+### How do I get this Add-on?
 Block Contained is still under development and not all features work as intended now. So it will not be published to AMO any time soon. If you really want to try it out, please clone this repository and use the `about:debugging` page to [load it as a temporary Add-on](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/). Because I didn't upload images used in the UI, it probably won't display correctly. I may upload the whole workspace as a release package later.

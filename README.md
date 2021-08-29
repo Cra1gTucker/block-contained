@@ -9,7 +9,7 @@ Block Contained是一个运行于Firefox浏览器上的**附加组件**（也可
 ## 那么它是否可以...？
 **不行。** Block Contained主要针对的是由于防火墙无法访问或速度很慢的静态库资源（像是jQuery、Google Fonts一类的）。您的所有网络流量仍将通过防火墙管制，这也意味着这个功能是完全合法合规的。
 ## 它的工作原理是什么？
-在国内，如果您经常访问国外的技术网站，您会发现不只有Reddit、Facebook之类的网站不能正常访问，一些可以正常连接的网页也会显示异常或者缓慢。这是因为这些网站引用了由Google或Cloudflare等网站提供的CDN上的资源（这里指的是JavaScript库或CSS表），前者由连接重置封锁，不影响速度但会使页面不能正确载入，而后者在浏览器看来呈现可以连接，但始终不响应的状态，这会使Firefox这种script不载入完就索性不显示任何内容的浏览器十分缓慢。
+在国内，如果您经常访问国外的技术网站，您会发现不只有Reddit、Facebook之类的网站不能正常访问，一些可以正常连接的网页（例如Stack Overflow）也会显示异常或者缓慢。这是因为这些网站引用了由Google或Cloudflare等网站提供的CDN上的资源（这里指的是JavaScript库或CSS表），前者由连接重置封锁，会使页面不能正确载入，而后者有时在浏览器看来呈现可以连接，但始终不响应的状态，这会使Firefox这种script不载入完就索性不显示任何内容的浏览器十分缓慢。
 
 Block Contained通过以下方式尝试解决这个问题：
 - 将已知使用cdnjs API的网站的请求**重定向**到国内可以访问的其它CDN上
@@ -24,7 +24,5 @@ Block Contained通过以下方式尝试解决这个问题：
 ## FAQ
 ### Why is it in English?
 简单来说，嫌麻烦。我并不想处理任何由于中文编码造成的错误。以后也大概率不会用中文重写。
-### 你的代码/设计/想法很差诶...
-有一说一，确实。前文已经提到这个算是练习项目，各方面自然不会很专业和周到。项目使用的是开源许可证，如果你觉得任何一部分有用，都可以fork或者clone后进行任意修改。
 ### 那么...怎么才能使用这个呢？
-这个项目仍在开发中，短时间内不会上AMO，你要是非要用一下的话，请clone这个项目，然后在Firefox的`about:debugging`页面中[载入临时附加组件](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/)并选择manifest.json，不过因为我没有把UI中用到的图片资源上传，所以显示上可能不太正常。以后我可能会以release的形式上传完整的项目。
+这个项目并不完善，短时间内不会上AMO，你要是非要用一下的话，请clone这个项目，然后在Firefox的`about:debugging`页面中[载入临时附加组件](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/)并选择manifest.json，不过因为我没有把UI中用到的图片资源上传，所以显示上可能不太正常。以后我可能会以release的形式上传完整的项目。
